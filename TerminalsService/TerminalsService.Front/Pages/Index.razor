@@ -1,0 +1,68 @@
+﻿@page "/"
+@using TerminalsService.Front.Service
+@using TerminalsService.Front.Helpers
+
+@inject IJSRuntime _js
+@inject HttpClient _httpClient
+@inject IMapService _mapService
+@inject IStyleHelper _styleHelper
+
+<div class="body">
+    <div id='map' class="map"></div>
+</div>
+
+<div class="icon-menu">
+  <span @onclick="async () => { await _styleHelper.OpenMenuAsync(); }" class=""><img src="img/menu.svg" alt=""></span>
+</div>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" @onclick="async () => { await _styleHelper.CloseMenuAsync(); }">&times;</a>
+    <h1 class="title-menu">Параметры просчитанных маршрутов</h1>
+    <div class="parameters">
+        <div class="parameters-group">
+            <p>Выберите дату маршрутов</p>
+            <input @bind="_dateTripReady" class="input-date" type="date" min="2022-01-01" max="2023-12-31">
+        </div>
+        
+        <div>
+            <button @onclick="ViewResultAsync" class="сalculation-btn">
+                Посмотреть результат
+            </button>
+        </div>
+    </div>
+
+    <h1 class="title-menu" style="margin-top: 20px">Параметры расчетов</h1>
+    <div class="parameters">
+        <div class="parameters-group">
+            <p>Выберите дату данных</p>
+            <input @bind="_dateTripСalc" class="input-date" type="date" min="2022-01-01" max="2023-12-31">
+        </div>
+
+        <div class="parameters-group">
+            <p>Загрузите файл с утренними данными терминалов</p>
+            <InputFile OnChange="OnInputFileChange" AdditionalAttributes="@_additionalAttributes"></InputFile>
+        </div>
+
+        <div>
+            <button @onclick="SendForCalculationsAsync" class="сalculation-btn">
+                Расчет
+            </button>
+        </div>
+    </div>
+
+    <div class="settings-maps">
+        <h1 class="title-menu">Параметры отображения элементов</h1>
+        <div class="setting">
+            <button @onclick="StyleTerminal" class="сalculation-btn setting-btn @activeSettingBtnTerminal">
+                Терминалы
+            </button>
+        </div>
+
+        <div class="setting">
+            @foreach (var car in _routes)
+            {
+                <button value="@car.Car.Id" @onclick="async () => await StyleCarRoute(car.Car.Id)" id="car-route-@car.Car.Id" class="сalculation-btn setting-btn setting-btn-active car-btn" style="border-color: @ProjectConstants.ColorDictionary[car.Car.Id]">Маршрут @car.Car.Id</button>
+            }
+        </div>
+    </div>
+</div>
